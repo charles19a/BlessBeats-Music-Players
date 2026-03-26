@@ -1,0 +1,130 @@
+{% extends "musicplayer/base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}{% trans "Sign Up" %} - BlessBeats{% endblock %}
+
+{% block extra_head %}
+<!-- Re-using the same premium auth style -->
+<style>
+.app-container { display: block !important; }
+aside, .player-bar, header { display: none !important; }
+main { 
+    display: block !important; 
+    padding: 0 !important; 
+    width: 100% !important; 
+    height: 100vh !important; 
+    background: white !important;
+}
+
+.auth-page { display: flex; height: 100vh; width: 100vw; }
+
+.auth-left {
+    flex: 1.2;
+    background: #0f111a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 60px;
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+}
+
+.auth-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+    background: #ffffff;
+}
+
+.auth-form-container { width: 100%; max-width: 420px; }
+
+.auth-form-container h2 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #0f172a;
+}
+
+.auth-subtitle { color: #64748b; margin-bottom: 40px; font-size: 1.05rem; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-weight: 700; font-size: 0.85rem; color: #475569; margin-bottom: 10px; }
+.form-group input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus { border-color: #6366f1; background: #fff; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+
+.btn-auth-submit {
+    width: 100%;
+    padding: 18px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-auth-submit:hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+@media (max-width: 900px) {
+    .auth-left { display: none; }
+    .auth-right { padding: 40px 20px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-left">
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 3.5rem; margin-bottom: 20px;">Join Us</h1>
+        <p style="font-size: 1.4rem; opacity: 0.8; font-family: 'Playfair Display', serif; text-align: center; max-width: 400px; line-height: 1.6;">
+            Start your worship journey today with BlessBeats.
+        </p>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-form-container">
+            <h2>Create an account</h2>
+            <p class="auth-subtitle">Already have an account? <a href="{% url 'account_login' %}" style="color: #6366f1; font-weight: 700; text-decoration: none;">Sign in</a></p>
+
+            <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                <div class="form-group">
+                    <label>{{ field.label|upper }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: #f43f5e; font-size: 0.8rem; margin-top: 4px;">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+
+                <button class="btn-auth-submit" type="submit">{% trans "Sign Up" %}</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

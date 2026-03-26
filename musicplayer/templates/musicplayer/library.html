@@ -1,0 +1,72 @@
+{% extends 'musicplayer/base.html' %}
+{% load static %}
+
+{% block title %}Your Library - BlessBeats{% endblock %}
+
+{% block content %}
+<div class="staggered-entry">
+    <div class="welcome-section">
+        <h2 style="font-size: 2.5rem;">{{ page_title }}</h2>
+        <p>Tracks in your sacred collection.</p>
+    </div>
+
+    <!-- Filters -->
+    <div style="display: flex; gap: 12px; margin-bottom: 40px; overflow-x: auto; padding-bottom: 15px;">
+        <a href="{% url 'musicplayer:library' %}" 
+           class="nav-link {% if not is_favorites_view %}active{% endif %}"
+           style="padding: 10px 24px; font-size: 0.9rem;">
+           All Tracks
+        </a>
+        <a href="{% url 'musicplayer:library' %}?view=favorites" 
+           class="nav-link {% if is_favorites_view %}active{% endif %}"
+           style="padding: 10px 24px; font-size: 0.9rem;">
+           My Favorites
+        </a>
+        <div style="flex: 1;"></div>
+        <div style="display: flex; gap: 8px;">
+            <a href="?sort=recent" class="btn-control" title="Recent"><i data-lucide="clock" style="width: 18px;"></i></a>
+            <a href="?sort=name" class="btn-control" title="A-Z"><i data-lucide="sort-asc" style="width: 18px;"></i></a>
+        </div>
+    </div>
+
+    <!-- Songs ListView -->
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+        {% for song in songs %}
+        <div class="lib-item" 
+             data-audio="{{ song.audio }}" 
+             data-title="{{ song.title }}" 
+             data-artist="{{ song.artist.name }}" 
+             data-cover="{% if song.cover %}{{ song.cover.url }}{% else %}{% static 'img/default_cover.png' %}{% endif %}"
+             data-lyrics="{{ song.lyrics|default:'' }}"
+             data-lyrics-tamil="{{ song.lyrics_tamil|default:'' }}"
+             data-id="{{ song.id }}">
+            
+            <div style="width: 40px; color: var(--text-sub); font-size: 0.85rem; font-weight: 700; text-align: center;"><i data-lucide="music" style="width: 14px;"></i></div>
+            
+            <img src="{% if song.cover %}{{ song.cover.url }}{% else %}{% static 'img/default_cover.png' %}{% endif %}" 
+                 style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;">
+            
+            <div style="flex: 1; margin-left: 8px;">
+                <div style="font-weight: 700; font-size: 1rem; color: #fff;">{{ song.title }}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); padding-top: 2px;">{{ song.artist.name }}</div>
+            </div>
+            
+            <div style="flex: 1; font-size: 0.9rem; color: var(--text-sub);" class="hide-mobile">{{ song.album.title|default:"BlessBeats Original" }}</div>
+            
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <button class="fav-btn {% if song.id in favorite_ids %}active{% endif %}" 
+                        onclick="event.stopPropagation(); toggleFavorite({{ song.id }}, this)" 
+                        style="background: none; border: none; color: inherit; cursor: pointer;">
+                    <i data-lucide="heart" {% if song.id in favorite_ids %}fill="currentColor"{% endif %} style="width: 18px;"></i>
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 100px 0; opacity: 0.5;">
+            <i data-lucide="music" style="width: 48px; height: 48px; margin-bottom: 20px;"></i>
+            <p>No tracks found in this collection.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
