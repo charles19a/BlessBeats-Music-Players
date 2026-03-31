@@ -1,9 +1,12 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import Song, Category, Artist, Album, FavoriteSong
+from django.contrib.auth import get_user_model
 from django.utils import timezone
+from .models import Song, Category, Artist, Album, FavoriteSong
+from allauth.account.utils import user_pk_to_url_str
+from allauth.account.forms import default_token_generator
 
 def get_base_context(request):
     """Utility to provide sidebar and common data."""
@@ -202,3 +205,23 @@ def set_timezone(request):
             request.session['django_timezone'] = tzname
             return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
+
+def fast_reset_view(request):
+    """Dynamically generates a secure reset link and redirects the user immediately."""
+    context = {'status': None, 'email': ''}
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        User = get_user_model()
+        user = User.objects.filter(email=email).first()
+        
+        if user:
+            # Generate the dynamic Allauth token
+            uid = user_pk_to_url_str(user)
+            token = default_token_generator.make_token(user)
+            # Redirect to the official Update Password page dynamically
+            return redirect('account_reset_password_from_key', uidb36=uid, key=token)
+        else:
+            context['status'] = 'error'
+            context['email'] = email
+    
+    return render(request, 'musicplayer/fast_reset.html', context)

@@ -3,33 +3,38 @@
 
 {% block content %}
 <div class="main-content-flow">
-    <div class="welcome-section">
-        <h2>
-            {% if 5 <= hour < 12 %}Good Morning{% elif 12 <= hour < 17 %}Good Afternoon{% else %}Good Evening{% endif %}, 
-            <span style="color: var(--accent);">{{ user.username }}</span>
-            <span style="display: block; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 8px; opacity: 0.7;">
-                <i data-lucide="clock" style="width: 14px; vertical-align: middle; margin-right: 4px;"></i>
-                {{ time_12 }} &bull; {{ time_24 }}
-            </span>
-        </h2>
-        <p>May your spirit be lifted through these worship melodies.</p>
+    <div class="welcome-section" style="margin-bottom: 56px;">
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 2px;">
+            <div style="background: var(--accent-soft); padding: 10px; border-radius: 12px; border: 1px solid var(--accent-glow);">
+                <i data-lucide="{% if 5 <= hour < 12 %}sun{% elif 12 <= hour < 17 %}cloud-sun{% else %}moon-star{% endif %}" style="width: 28px; height: 28px; color: var(--accent);"></i>
+            </div>
+            <h2 style="font-size: 3.2rem; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;">
+                {% if 5 <= hour < 12 %}Good Morning{% elif 12 <= hour < 17 %}Good Afternoon{% else %}Good Evening{% endif %}, 
+                <span style="color: var(--accent); text-shadow: 0 0 30px var(--accent-glow);">{{ user.username }}</span>
+            </h2>
+        </div>
+        <p style="font-weight: 600; font-size: 1.1rem; color: var(--text-muted); opacity: 0.8; padding-left: 60px;">
+            <span style="color: #fff;">{{ time_12 }}</span> &mdash; Grace and peace be with you.
+        </p>
     </div>
 
     <!-- Daily Reflection Section -->
-    <div style="background: linear-gradient(135deg, rgba(212,0,107,0.1) 0%, rgba(125,0,85,0.05) 100%); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; margin-bottom: 40px; display: flex; align-items: flex-start; gap: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -20px; right: -20px; opacity: 0.1;">
-            <i data-lucide="sun" style="width: 120px; height: 120px; color: var(--accent);"></i>
+    <!-- Daily Reflection Section -->
+    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 32px; margin-bottom: 48px; display: flex; align-items: flex-start; gap: 24px; position: relative; overflow: hidden; box-shadow: var(--shadow-lg);">
+        <div style="position: absolute; top: -30px; right: -30px; opacity: 0.05;">
+            <i data-lucide="sun" style="width: 150px; height: 150px; color: #fff;"></i>
         </div>
-        <div style="width: 50px; height: 50px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 16px rgba(212,0,107,0.3);">
-            <i data-lucide="sparkles" style="color: #fff;"></i>
+        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--accent), #7e22ce); border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 10px 25px var(--accent-glow);">
+            <i data-lucide="sparkles" style="color: #fff; width: 28px; height: 28px;"></i>
         </div>
         <div style="flex: 1;">
-            <h4 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 8px;">Amen</h4>
-            <p style="font-style: italic; color: rgba(255,255,255,0.8); line-height: 1.6; font-size: 1.05rem; margin-bottom: 12px; max-width: 800px;">
-                "Your word is a lamp to my feet and a light to my path." &mdash; Psalm 119:105
+            <h4 style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 12px; font-weight: 800;">Verse of the Day</h4>
+            <p style="font-style: italic; color: #fff; line-height: 1.6; font-size: 1.25rem; margin-bottom: 16px; max-width: 850px; font-weight: 600;">
+                "Your word is a lamp to my feet and a light to my path."
             </p>
-            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
-                உம்முடைய வசனம் என் கால்களுக்குத் தீபமும், என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது. &mdash; சங்கீதம் 119:105
+            <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; border-left: 2px solid var(--accent-glow); padding-left: 16px;">
+                உம்முடைய வசனம் என் கால்களுக்குத் தீபமும், என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது. <br>
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dim); margin-top: 8px; display: inline-block;">&mdash; Psalm 119:105</span>
             </p>
         </div>
     </div>
@@ -42,14 +47,14 @@
         <div class="card-scroller">
             <!-- Keerthanai Padal Album Card -->
             <a href="{% url 'musicplayer:library' %}{% if keerthanai_album %}?album={{ keerthanai_album.id }}{% endif %}" style="text-decoration: none; color: inherit;">
-                <div class="song-card" style="background: rgba(251, 191, 36, 0.08); border: 2px solid #fbbf24; opacity: 1 !important; visibility: visible !important;">
-                    <div style="position: absolute; top: 10px; right: 10px;">
-                        <span style="background: #fbbf24; color: #000; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; text-transform: uppercase;">Album</span>
+                <div class="song-card" style="border-color: var(--accent);">
+                    <div style="position: absolute; top: 12px; right: 12px; z-index: 2;">
+                        <span style="background: var(--accent); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; box-shadow: 0 4px 10px var(--accent-glow);">Album</span>
                     </div>
-                    <img src="{% if keerthanai_album and keerthanai_album.cover_image %}{{ keerthanai_album.cover_image.url }}{% else %}{% static 'img/default_cover.png' %}{% endif %}" alt="Keerthanai" class="card-thumb" style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                    <div class="card-title" style="color: #fbbf24;">Keerthanai Padal</div>
+                    <img src="{% if keerthanai_album and keerthanai_album.cover_image %}{{ keerthanai_album.cover_image.url }}{% else %}{% static 'img/default_cover.png' %}{% endif %}" alt="Keerthanai" class="card-thumb" style="box-shadow: var(--shadow-lg);">
+                    <div class="card-title" style="color: var(--text-primary);">Keerthanai Padal</div>
                     <div class="card-artist">Complete Tamil Collection</div>
-                    <div class="play-badge" style="background: #fbbf24; box-shadow: 0 10px 20px rgba(251, 191, 36, 0.4); opacity: 1; transform: translateY(0);">
+                    <div class="play-badge">
                         <i data-lucide="play" fill="white"></i>
                     </div>
                 </div>

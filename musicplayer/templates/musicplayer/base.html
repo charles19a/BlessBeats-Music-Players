@@ -186,5 +186,6 @@
         window.favoriteIds = {{ favorite_ids|safe|default:"[]" }};
         lucide.createIcons();
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -39,8 +39,9 @@
              data-lyrics-tamil="{{ song.lyrics_tamil|default:'' }}"
              data-id="{{ song.id }}">
             
-            <div style="width: 40px;" class="hide-mobile"><i data-lucide="music" style="width: 14px;"></i></div>
-            
+            <div class="lib-item-viz">
+                <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+            </div>
             <img src="{% if song.cover %}{{ song.cover.url }}{% else %}{% static 'img/default_cover.png' %}{% endif %}" 
                  class="song-thumb">
             

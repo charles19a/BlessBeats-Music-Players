@@ -40,6 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const lyricsTitle       = document.getElementById('lyrics-title');
     const lyricsArtist      = document.getElementById('lyrics-artist');
     const lyricsCoverSmall  = document.getElementById('lyrics-cover-small');
+    
+    /* ── Search refs ── */
+    const searchInput       = document.getElementById('live-search-input');
+    const searchDropdown    = document.getElementById('search-dropdown');
+    const searchResultsList = document.getElementById('search-results-list');
+    const searchClearBtn    = document.getElementById('search-clear-btn');
+    const liveSearchWrap    = document.getElementById('live-search-wrap');
 
     if (!audio || !playPauseBtn) return;  // Guard
 
@@ -122,9 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Highlight active card
+        // Highlight active card & scroll to it
         songCards.forEach(c => c.classList.remove('playing'));
         card.classList.add('playing');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         // Sync fav icon
         syncFavState(currentSongId);
@@ -375,7 +383,124 @@ document.addEventListener('DOMContentLoaded', () => {
             lyricsModal.classList.remove('open');
             document.body.style.overflow = '';
         }
+        // Hide search dropdown if clicking outside
+        if (searchDropdown && !liveSearchWrap.contains(e.target)) {
+            searchDropdown.style.display = 'none';
+        }
     });
+
+    /* ── Live Search Dropdown Logic ── */
+    let searchDebounce = null;
+    let selectedSearchIdx = -1;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchDebounce);
+            const q = searchInput.value.trim();
+            
+            if (searchClearBtn) searchClearBtn.style.display = q ? 'block' : 'none';
+            if (!q) { searchDropdown.style.display = 'none'; selectedSearchIdx = -1; return; }
+
+            searchDebounce = setTimeout(() => {
+                fetch(`/api/search/?q=${encodeURIComponent(q)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        searchResultsList.innerHTML = '';
+                        selectedSearchIdx = -1;
+                        if (!data.songs || data.songs.length === 0) {
+                            searchResultsList.innerHTML = '<div style="padding: 18px; color: var(--text-dim); text-align: center; font-size: 0.9rem;">No tracks found</div>';
+                        } else {
+                            data.songs.forEach((song, idx) => {
+                                const div = document.createElement('div');
+                                div.className = 'search-result-item';
+                                div.setAttribute('data-index', idx);
+                                div.innerHTML = `
+                                    <div class="playing-viz" style="display:none; width:12px; margin-right:4px;">
+                                        <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+                                    </div>
+                                    <img src="${song.cover}" style="width:40px; height:40px; border-radius:8px; object-fit:cover; flex-shrink:0;">
+                                    <div style="flex:1; min-width:0;">
+                                        <div class="truncate" style="font-weight:700; font-size:0.92rem; color:#fff;">${song.title}</div>
+                                        <div class="truncate" style="font-size:0.75rem; color:var(--text-muted);">${song.artist}</div>
+                                    </div>
+                                    <div style="color:var(--text-dim);"><i data-lucide="play" style="width:14px;"></i></div>
+                                `;
+                                div.onclick = () => selectSearchResult(song);
+                                searchResultsList.appendChild(div);
+                            });
+                            if (window.lucide) lucide.createIcons();
+                        }
+                        searchDropdown.style.display = 'block';
+                    });
+            }, 250);
+        });
+
+        function selectSearchResult(song) {
+            const mockCard = document.createElement('div');
+            mockCard.className = 'lib-item';
+            mockCard.setAttribute('data-audio', song.audio);
+            mockCard.setAttribute('data-title', song.title);
+            mockCard.setAttribute('data-artist', song.artist);
+            mockCard.setAttribute('data-cover', song.cover);
+            mockCard.setAttribute('data-lyrics', song.lyrics);
+            mockCard.setAttribute('data-lyrics-tamil', song.lyrics_tamil);
+            mockCard.setAttribute('data-id', song.id);
+            
+            songCards.unshift(mockCard);
+            loadSong(0);
+            searchDropdown.style.display = 'none';
+            searchInput.value = '';
+            if (searchClearBtn) searchClearBtn.style.display = 'none';
+            selectedSearchIdx = -1;
+        }
+
+        function updateSearchSelection() {
+            const items = searchResultsList.querySelectorAll('.search-result-item');
+            items.forEach((item, idx) => {
+                item.classList.toggle('selected', idx === selectedSearchIdx);
+                if (idx === selectedSearchIdx) item.scrollIntoView({ block: 'nearest' });
+            });
+        }
+
+        searchInput.addEventListener('keydown', (e) => {
+            const items = searchResultsList.querySelectorAll('.search-result-item');
+            if (searchDropdown.style.display === 'block' && items.length > 0) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedSearchIdx = (selectedSearchIdx + 1) % items.length;
+                    updateSearchSelection();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedSearchIdx = (selectedSearchIdx - 1 + items.length) % items.length;
+                    updateSearchSelection();
+                } else if (e.key === 'Enter' && selectedSearchIdx >= 0) {
+                    e.preventDefault();
+                    items[selectedSearchIdx].click();
+                } else if (e.key === 'Escape') {
+                    searchDropdown.style.display = 'none';
+                }
+            } else if (e.key === 'Enter') {
+                const q = searchInput.value.trim();
+                if (q) window.location.href = `/search/?q=${encodeURIComponent(q)}`;
+            }
+        });
+
+        // Re-show dropdown on refocus if query exists
+        searchInput.addEventListener('focus', () => {
+            if (searchInput.value.trim() && searchResultsList.children.length > 0) {
+                searchDropdown.style.display = 'block';
+            }
+        });
+    }
+
+    if (searchClearBtn) {
+        searchClearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClearBtn.style.display = 'none';
+            searchDropdown.style.display = 'none';
+            searchInput.focus();
+        });
+    }
 
     function nl2br(str) {
         if (typeof str !== 'string') return '';

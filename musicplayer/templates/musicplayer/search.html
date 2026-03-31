@@ -12,8 +12,7 @@
         <p>Tracks identified in the archive.</p>
     </div>
 
-    <!-- Search Results ListView -->
-    <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 40px;">
+    <div class="song-list" style="margin-top: 40px;">
         {% for song in songs %}
         <div class="lib-item" 
              data-audio="{{ song.audio }}" 
@@ -24,23 +23,24 @@
              data-lyrics-tamil="{{ song.lyrics_tamil|default:'' }}"
              data-id="{{ song.id }}">
             
-            <div style="width: 40px; color: var(--text-sub); font-size: 0.85rem; font-weight: 700; text-align: center;"><i data-lucide="music" style="width: 14px;"></i></div>
-            
-            <img src="{% if song.cover %}{{ song.cover.url }}{% else %}{% static 'img/default_cover.png' %}{% endif %}" 
-                 style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;">
-            
-            <div style="flex: 1; margin-left: 8px;">
-                <div style="font-weight: 700; font-size: 1rem; color: #fff;">{{ song.title }}</div>
-                <div style="font-size: 0.85rem; color: var(--text-muted); padding-top: 2px;">{{ song.artist.name }}</div>
+            <div class="lib-item-viz">
+                <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
             </div>
             
-            <div style="flex: 1; font-size: 0.9rem; color: var(--text-sub);" class="hide-mobile">{{ song.album.title|default:"BlessBeats Original" }}</div>
+            <img src="{% if song.cover %}{{ song.cover.url }}{% else %}{% static 'img/default_cover.png' %}{% endif %}" 
+                 class="song-thumb">
+            
+            <div class="song-meta">
+                <div class="song-name">{{ song.title }}</div>
+                <div class="song-sub">{{ song.artist.name }}</div>
+            </div>
+            
+            <div class="song-album hide-mobile">{{ song.album.title|default:"BlessBeats Original" }}</div>
             
             <div style="display: flex; align-items: center; gap: 20px;">
                 <button class="fav-btn {% if song.id in favorite_ids %}active{% endif %}" 
-                        onclick="event.stopPropagation(); toggleFavorite({{ song.id }}, this)" 
-                        style="background: none; border: none; color: inherit; cursor: pointer;">
-                    <i data-lucide="heart" {% if song.id in favorite_ids %}fill="currentColor"{% endif %} style="width: 18px;"></i>
+                        onclick="event.stopPropagation(); toggleFavorite({{ song.id }}, this)">
+                    <i data-lucide="heart" {% if song.id in favorite_ids %}fill="currentColor"{% endif %}></i>
                 </button>
             </div>
         </div>

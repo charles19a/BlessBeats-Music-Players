@@ -275,6 +275,23 @@
             font-size: 0.9rem;
         }
 
+        .password-wrap { position: relative; width: 100%; }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+        .toggle-password:hover { color: #fff; }
+
         @media (max-width: 900px) {
             .auth-left { display: none; }
             .auth-right { padding: 40px 24px; background: linear-gradient(135deg, #1a0010, #3a0028); border: none; }
@@ -341,7 +358,12 @@
                         <label style="margin-bottom: 0;">Password</label>
                         <a href="{% url 'account_reset_password' %}">Forgot password?</a>
                     </div>
-                    <input type="password" name="password" placeholder="••••••••" required id="id_password">
+                    <div class="password-wrap">
+                        <input type="password" name="password" placeholder="••••••••" required id="id_password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('id_password', this)">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <button class="btn-submit" type="submit">Sign In to BlessBeats</button>
@@ -351,6 +373,21 @@
 </div>
 
 <script src="https://unpkg.com/lucide@latest"></script>
-<script>lucide.createIcons();</script>
+<script>
+    lucide.createIcons();
+    
+    function togglePasswordVisibility(fieldId, btn) {
+        const input = document.getElementById(fieldId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+            input.type = 'password';
+            icon.setAttribute('data-lucide', 'eye');
+        }
+        lucide.createIcons(); // Re-render the eye/eye-off icon
+    }
+</script>
 </body>
 </html>

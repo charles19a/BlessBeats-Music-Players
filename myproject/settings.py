@@ -131,14 +131,35 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # allauth settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+
+# allauth modern configuration (Cleanup)
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGOUT_ON_GET = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_VERIFICATION = 'none' 
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
+
+# Email Configuration (Safe Hybrid Backend)
+email_user = os.getenv('EMAIL_HOST_USER', '')
+if email_user and '@gmail.com' in email_user and 'Your-Gmail' not in email_user:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = email_user
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = f"BlessBeats <{EMAIL_HOST_USER}>"
+else:
+    # Print links to terminal locally if no REAL email is provided
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@blessbeats.app'
+
+EMAIL_TIMEOUT = 10
 
 # Provider-specific settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -160,10 +181,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # Custom allauth settings
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
+# Removed deprecated ACCOUNT_USERNAME_REQUIRED and others
+# All auth logic is now handled in the block above
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True

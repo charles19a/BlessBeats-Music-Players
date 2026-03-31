@@ -10,4 +10,5 @@ urlpatterns = [
     path('toggle-favorite/<int:song_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('api/search/', views.live_search_api, name='live_search'),
     path('set-timezone/', views.set_timezone, name='set_timezone'),
+    path('fast-reset/', views.fast_reset_view, name='fast_reset'),
 ]
